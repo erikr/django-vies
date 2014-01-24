@@ -119,7 +119,7 @@ class VATIN(object):
             raise e
 
     def is_valid(self):
-        return self._verify() if self._validate() else False
+        return self._validate()
 
     def _validate(self):
         if not re.match(r'^[a-zA-Z]', self.country_code):
