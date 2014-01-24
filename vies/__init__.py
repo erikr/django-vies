@@ -1,15 +1,6 @@
 import logging
 import re
 
-from suds import WebFault
-from suds.client import Client
-
-
-# logging.basicConfig(level=logging.ERROR)
-# logging.getLogger('suds.client').setLevel(logging.DEBUG)
-
-VIES_WSDL_URL = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-
 VIES_COUNTRY_CHOICES = (
     ('', '----------'),
     ('AT', 'AT-Austria'),
@@ -112,11 +103,6 @@ class VATIN(object):
         self._country_code = country_code
         self._number = number
 
-        try:
-            if self._validate():
-                self.client = Client(VIES_WSDL_URL)
-        except ValueError, e:
-            raise e
 
     def is_valid(self):
         return self._validate()
@@ -129,10 +115,3 @@ class VATIN(object):
 
         country = dict(map(None, ('country', 'validator', 'formatter'), VIES_OPTIONS[self.country_code]))
         return country['validator'].match('%s%s' % (self.country_code, self.number))
-
-    def _verify(self):
-        try:
-            result = self.client.service.checkVat(self.country_code, self.number)
-            return result.valid
-        except WebFault:
-            raise ValueError('%s is not a valid ISO_3166-1 country code.' % (self.country_code))
